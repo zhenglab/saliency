@@ -1,7 +1,7 @@
-function benchNSS()
+function benchAUC_Borji()
 InputFixationMap = './tmp/fixationMap/';
 InputSaliencyMap = './tmp/SaliencyMaps/';
-OutputResults = './tmp/results/NSS/';
+OutputResults = './tmp/results/AUC_Borji/';
 traverse(InputFixationMap, InputSaliencyMap, OutputResults)
 
 function traverse(InputFixationMap, InputSaliencyMap, OutputResults)
@@ -18,8 +18,8 @@ for i = 1:length(idsFixationMap)
     else
         series=regexp(OutputResults, '/');
         DatasetsName=OutputResults((series(end-1)+1):(series(end)-1));
-        DatasetsTxt = fopen(strcat(OutputResults, 'NSS-', DatasetsName, '.txt'), 'w');
-        fprintf(DatasetsTxt, '%s\t%s\n', 'Model', 'NSS');
+        DatasetsTxt = fopen(strcat(OutputResults, 'AUC_Borji-', DatasetsName, '.txt'), 'w');
+        fprintf(DatasetsTxt, '%s\t%s\n', 'Model', 'AUC_Borji');
         subidsSaliencyMap = dir(InputSaliencyMap);
         for curAlgNum = 3:length(subidsSaliencyMap)
             fprintf(DatasetsTxt, '%s\t', subidsSaliencyMap(curAlgNum, 1).name);
@@ -37,24 +37,24 @@ for i = 1:length(idsFixationMap)
                 end
             end
             %%
-            NSSscore = cell(1, imgNum);
+            AUC_Borji_score = cell(1, imgNum);
             for curImgNum = 3:(imgNum+2)
                 [pathstrFixationMap, nameFixationMap, extFixationMap] = fileparts(strcat(InputFixationMap, idsFixationMap(curImgNum, 1).name));
                 [pathstrSaliencyMap, nameSaliencyMap, extSaliencyMap] = fileparts(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/', subsubidsSaliencyMap(curImgNum, 1).name));
                 if strcmp(nameFixationMap, nameSaliencyMap)
                     curSaliencyMap = double(imread(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/', subsubidsSaliencyMap(curImgNum, 1).name)));
-                    curNSSscore = NSS(curSaliencyMap, fixLocs);
-                    NSSscore{curImgNum-2} = curNSSscore;
+                    curAUC_Borji_score = AUC_Borji(curSaliencyMap, fixLocs);
+                    AUC_Borji_score{curImgNum-2} = curAUC_Borji_score;
                 else
                     error('The name of FixationMap and SaliencyMap must be the same');
                 end
             end
-            NSSscore = mean(cell2mat(NSSscore), 2);
-            saveNSSscore = strcat('NSS', '_', subidsSaliencyMap(curAlgNum).name);
-            eval([saveNSSscore, '=', 'NSSscore']);
+            AUC_Borji_score = mean(cell2mat(AUC_Borji_score), 2);
+            saveAUC_Borji_score = strcat('AUC_Borji', '_', subidsSaliencyMap(curAlgNum).name);
+            eval([saveAUC_Borji_score, '=', 'AUC_Borji_score']);
             
-            save(outFileName, saveNSSscore);
-            fprintf(DatasetsTxt, '%f\n', NSSscore);
+            save(outFileName, saveAUC_Borji_score);
+            fprintf(DatasetsTxt, '%f\n', AUC_Borji_score);
         end
         break;
     end
