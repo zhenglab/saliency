@@ -3,7 +3,7 @@ clc
 load imgsalSize.mat;
 load imgsalFix.mat;
 imgNum = length(fixCell);
-imgsal = cell(1, imgNum);
+%imgsal = cell(1, imgNum);
 for i = 1:imgNum
     hight = sizeData(i, 1);
     width = sizeData(i, 2);
@@ -18,6 +18,7 @@ for i = 1:imgNum
        y = fixationLocation(j, 2);
        fixationMap(x, y) = 1;
     end
-    imgsal{1, i} = fixationMap;
+    %imgsal{1, i} = fixationMap;
+    eval(['save ', strcat('./imgsal/', num2str(i), '.mat'), ' fixationMap'])
 end
 %save judd judd -v7.3
