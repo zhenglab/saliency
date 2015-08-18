@@ -21,8 +21,11 @@ p.thList = linspace(0, 1, p.thNum);
 
 
 %% Generating fixation parameters
-p.fixationSets = {'bruce'; 'cerf'; 'judd'; 'imgsal'; 'pascal'};
-p.fixationAlgs = {'aws'; 'aim'; 'sig'; 'dva'; 'gbvs'; 'sun'; 'itti'};
+%CVBIOUC% p.fixationSets = {'bruce'; 'cerf'; 'judd'; 'imgsal'; 'pascal'};
+p.fixationSets = {'bruce'; 'judd'; 'imgsal'; 'pascal'}; %CVBIOUC%
+%CVBIOUC% p.fixationAlgs = {'aws'; 'aim'; 'sig'; 'dva'; 'gbvs'; 'sun'; 'itti'};
+p.fixationAlgs = {'AIM'; 'COV'; 'GBVS'; 'HFT'; 'ITTI'; 'PFDN'; 'PQFT'; 'SeR';...
+    'SHFT'; 'SHFTnoCenterBias'; 'SIG'; 'SIM'; 'SR'; 'SUN'}; %CVBIOUC%
 
 p.sigmaList = 0:0.01:0.08;
 p.sigmaLen = length(p.sigmaList);
@@ -53,7 +56,8 @@ setNum = length(p.fixationSets);
 p.fixationSetSize = zeros(setNum, 1);
 for curSetNum = 1:setNum
 	curSetName = p.fixationSets{curSetNum};
-	fileList = dir(sprintf('%s/imgs/%s/*.jpg', p.datasetDir, curSetName));
+	%CVBIOUC% fileList = dir(sprintf('%s/imgs/%s/*.jpg', p.datasetDir, curSetName));
+    fileList = dir(sprintf('%s/Images/%s/*.jpg', p.datasetDir, curSetName)); %CVBIOUC%
 	p.fixationSetSize(curSetNum) = length(fileList);
 end
 

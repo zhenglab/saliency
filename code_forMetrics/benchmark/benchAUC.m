@@ -37,7 +37,8 @@ for curSet = 1:size(p.fixationSets, 1)
 			negFix(offFixInd) = [];
 			
 			% generate full-sized saliency maps
-			rawSMap = im2double(imread(sprintf('%s/%s/%s/%d.png', p.algMapDir, curSetName, curAlgName, curImgNum)));
+			%CVBIOUC% rawSMap = im2double(imread(sprintf('%s/%s/%s/%d.png', p.algMapDir, curSetName, curAlgName, curImgNum)));
+            rawSMap = im2double(imread(sprintf('%s/%s/%s/%d.jpg', p.algMapDir, curSetName, curAlgName, curImgNum))); %CVBIOUC%
 			rawSMap = imresize(rawSMap, sizeData(curImgNum,:), 'bilinear');
 			kSizeList = norm(sizeData(curImgNum,:)).*p.sigmaList;
 			
