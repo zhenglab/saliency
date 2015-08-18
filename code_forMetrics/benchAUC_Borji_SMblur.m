@@ -17,13 +17,18 @@ for i = 1:length(idsFixationMap)
         traverse(strcat(InputFixationMap, idsFixationMap(i, 1).name, '/'), strcat(InputSaliencyMap, idsFixationMap(i, 1).name, '/'), strcat(OutputResults, idsFixationMap(i, 1).name, '/'));
     else
         subidsSaliencyMap = dir(InputSaliencyMap); 
-        for curAlgNum = 3:length(subidsSaliencyMap)
-            fprintf(DatasetsTxt, '%s\t', subidsSaliencyMap(curAlgNum, 1).name);
+        for curAlgNum = 1:length(subidsSaliencyMap)
+            if subidsSaliencyMap(curAlgNum, 1).name(1)=='.'
+                continue;
+            end
             outFileName = strcat(OutputResults, subidsSaliencyMap(curAlgNum, 1).name, '.mat');
             subsubidsSaliencyMap = dir(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/'));
             %% compute the number of images in the dataset
             imgNum = 0;
-            for curImgNum = 3:length(subsubidsSaliencyMap)
+            for curImgNum = 1:length(subsubidsSaliencyMap)
+                if subsubidsSaliencyMap(curImgNum, 1).name(1)=='.'
+                    continue;
+                end
                 try
                     eval(['load ', strcat(InputFixationMap, idsFixationMap(curImgNum, 1).name)]);
                     imread(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/', subsubidsSaliencyMap(curImgNum, 1).name));
@@ -33,10 +38,14 @@ for i = 1:length(idsFixationMap)
                 end
             end
             %%
-            sigmaList = 0:0.01:0.08;
+            sigmaList = 0:0.01:0.12;
             sigmaLen = length(sigmaList);        
             AUC_Borji_SMblur_score = zeros(sigmaLen, imgNum);
-            for curImgNum = 3:(imgNum+2)
+            tmpNum = 1;
+            for curImgNum = 1:length(subsubidsSaliencyMap)
+                if subsubidsSaliencyMap(curImgNum, 1).name(1)=='.'
+                    continue;
+                end
                 [pathstrFixationMap, nameFixationMap, extFixationMap] = fileparts(strcat(InputFixationMap, idsFixationMap(curImgNum, 1).name));
                 [pathstrSaliencyMap, nameSaliencyMap, extSaliencyMap] = fileparts(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/', subsubidsSaliencyMap(curImgNum, 1).name));
                 if strcmp(nameFixationMap, nameSaliencyMap)
@@ -67,7 +76,8 @@ for i = 1:length(idsFixationMap)
                         end
                         tmpAUC(curK) = AUC_Borji(smoothSMap, fixLocs);
                     end
-                    AUC_Borji_SMblur_score(:, curImgNum-2) = tmpAUC;
+                    AUC_Borji_SMblur_score(:, tmpNum) = tmpAUC;
+                    tmpNum = tmpNum+1;
                 else
                     error('The name of FixationMap and SaliencyMap must be the same');
                 end
