@@ -1,7 +1,7 @@
 function benchKL()
-InputFixationMap = './tmp/fixationMap/';
+InputFixationMap = './tmp/FixationMaps/';
 InputSaliencyMap = './tmp/SaliencyMaps/';
-OutputResults = './tmp/results/KL/';
+OutputResults = './tmp/Results/KL/';
 traverse(InputFixationMap, InputSaliencyMap, OutputResults)
 
 function traverse(InputFixationMap, InputSaliencyMap, OutputResults)
@@ -16,6 +16,9 @@ for i = 1:length(idsFixationMap)
         end
         traverse(strcat(InputFixationMap, idsFixationMap(i, 1).name, '/'), strcat(InputSaliencyMap, idsFixationMap(i, 1).name, '/'), strcat(OutputResults, idsFixationMap(i, 1).name, '/'));
     else
+        %% compute the number of images in the dataset
+        imgNum = length(idsFixationMap)-2;
+        %%
         series=regexp(OutputResults, '/');
         DatasetsName=OutputResults((series(end-1)+1):(series(end)-1));
         DatasetsTxt = fopen(strcat(OutputResults, 'KL-', DatasetsName, '.txt'), 'w');
@@ -28,44 +31,35 @@ for i = 1:length(idsFixationMap)
             fprintf(DatasetsTxt, '%s\t', subidsSaliencyMap(curAlgNum, 1).name);
             outFileName = strcat(OutputResults, subidsSaliencyMap(curAlgNum, 1).name, '.mat');
             subsubidsSaliencyMap = dir(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/'));
-            %% compute the number of images in the dataset
-            imgNum = 0;
-            for curImgNum = 1:length(subsubidsSaliencyMap)
-                if subsubidsSaliencyMap(curImgNum, 1).name(1)=='.'
-                    continue;
-                end
-                try
-                    eval(['load ', strcat(InputFixationMap, idsFixationMap(curImgNum, 1).name)]);
-                    imread(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/', subsubidsSaliencyMap(curImgNum, 1).name));
-                    imgNum = imgNum+1;
-                catch err
-                    error('The input FixationMap must be .mat format and the SaliencyMap must be image format');
-                end
-            end
-            %%
-            KLscore = cell(1, imgNum);
-            tmpNum = 1;
-            for curImgNum = 1:length(subsubidsSaliencyMap)
-                if subsubidsSaliencyMap(curImgNum, 1).name(1)=='.'
-                    continue;
-                end
-                [pathstrFixationMap, nameFixationMap, extFixationMap] = fileparts(strcat(InputFixationMap, idsFixationMap(curImgNum, 1).name));
-                [pathstrSaliencyMap, nameSaliencyMap, extSaliencyMap] = fileparts(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/', subsubidsSaliencyMap(curImgNum, 1).name));
-                if strcmp(nameFixationMap, nameSaliencyMap)
-                    curSaliencyMap = imread(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/', subsubidsSaliencyMap(curImgNum, 1).name));
-                    curKLscore = calcKLDivscore(fixLocs, curSaliencyMap);
-                    KLscore{tmpNum} = curKLscore;
-                    tmpNum = tmpNum+1;
-                else
-                    error('The name of FixationMap and SaliencyMap must be the same');
-                end
-            end
-            KLscore = mean(cell2mat(KLscore), 2);
-            saveKLscore = strcat('KL', '_', subidsSaliencyMap(curAlgNum).name);
-            eval([saveKLscore, '=', 'KLscore']);
             
-            save(outFileName, saveKLscore);
-            fprintf(DatasetsTxt, '%f\n', KLscore);
+            if length(subsubidsSaliencyMap) == length(idsFixationMap)
+                KLscore = cell(1, imgNum);
+                tmpNum = 1;
+                for curImgNum = 1:length(subsubidsSaliencyMap)
+                    if subsubidsSaliencyMap(curImgNum, 1).name(1)=='.'
+                        continue;
+                    end
+                    [pathstrFixationMap, nameFixationMap, extFixationMap] = fileparts(strcat(InputFixationMap, idsFixationMap(curImgNum, 1).name));
+                    [pathstrSaliencyMap, nameSaliencyMap, extSaliencyMap] = fileparts(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/', subsubidsSaliencyMap(curImgNum, 1).name));
+                    if strcmp(nameFixationMap, nameSaliencyMap)
+                        curSaliencyMap = imread(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/', subsubidsSaliencyMap(curImgNum, 1).name));
+                        eval(['load ', strcat(InputFixationMap, idsFixationMap(curImgNum, 1).name)]);
+                        curKLscore = calcKLDivscore(fixLocs, curSaliencyMap);
+                        KLscore{tmpNum} = curKLscore;
+                        tmpNum = tmpNum+1;
+                    else
+                        error('The name of FixationMap and SaliencyMap must be the same.');
+                    end
+                end
+                KLscore = mean(cell2mat(KLscore), 2);
+                saveKLscore = strcat('KL', '_', subidsSaliencyMap(curAlgNum).name);
+                eval([saveKLscore, '=', 'KLscore']);
+                
+                save(outFileName, saveKLscore);
+                fprintf(DatasetsTxt, '%f\n', KLscore);
+            else
+                error('The number of saliency maps and the number of fixation maps must be the same.');
+            end
         end
         break;
     end

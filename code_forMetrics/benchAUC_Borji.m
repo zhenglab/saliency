@@ -1,7 +1,7 @@
 function benchAUC_Borji()
-InputFixationMap = './tmp/fixationMap/';
+InputFixationMap = './tmp/FixationMaps/';
 InputSaliencyMap = './tmp/SaliencyMaps/';
-OutputResults = './tmp/results/AUC_Borji/';
+OutputResults = './tmp/Results/AUC_Borji/';
 traverse(InputFixationMap, InputSaliencyMap, OutputResults)
 
 function traverse(InputFixationMap, InputSaliencyMap, OutputResults)
@@ -16,6 +16,9 @@ for i = 1:length(idsFixationMap)
         end
         traverse(strcat(InputFixationMap, idsFixationMap(i, 1).name, '/'), strcat(InputSaliencyMap, idsFixationMap(i, 1).name, '/'), strcat(OutputResults, idsFixationMap(i, 1).name, '/'));
     else
+        %% compute the number of images in the dataset
+        imgNum = length(idsFixationMap)-2;
+        %%
         series=regexp(OutputResults, '/');
         DatasetsName=OutputResults((series(end-1)+1):(series(end)-1));
         DatasetsTxt = fopen(strcat(OutputResults, 'AUC_Borji-', DatasetsName, '.txt'), 'w');
@@ -28,44 +31,35 @@ for i = 1:length(idsFixationMap)
             fprintf(DatasetsTxt, '%s\t', subidsSaliencyMap(curAlgNum, 1).name);
             outFileName = strcat(OutputResults, subidsSaliencyMap(curAlgNum, 1).name, '.mat');
             subsubidsSaliencyMap = dir(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/'));
-            %% compute the number of images in the dataset
-            imgNum = 0;
-            for curImgNum = 1:length(subsubidsSaliencyMap)
-                if subsubidsSaliencyMap(curImgNum, 1).name(1)=='.'
-                    continue;
-                end
-                try
-                    eval(['load ', strcat(InputFixationMap, idsFixationMap(curImgNum, 1).name)]);
-                    imread(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/', subsubidsSaliencyMap(curImgNum, 1).name));
-                    imgNum = imgNum+1;
-                catch err
-                    error('The input FixationMap must be .mat format and the SaliencyMap must be image format');
-                end
-            end
-            %%
-            AUC_Borji_score = cell(1, imgNum);
-            tmpNum = 1;
-            for curImgNum = 1:length(subsubidsSaliencyMap)
-                if subsubidsSaliencyMap(curImgNum, 1).name(1)=='.'
-                    continue;
-                end
-                [pathstrFixationMap, nameFixationMap, extFixationMap] = fileparts(strcat(InputFixationMap, idsFixationMap(curImgNum, 1).name));
-                [pathstrSaliencyMap, nameSaliencyMap, extSaliencyMap] = fileparts(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/', subsubidsSaliencyMap(curImgNum, 1).name));
-                if strcmp(nameFixationMap, nameSaliencyMap)
-                    curSaliencyMap = double(imread(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/', subsubidsSaliencyMap(curImgNum, 1).name)));
-                    curAUC_Borji_score = AUC_Borji(curSaliencyMap, fixLocs);
-                    AUC_Borji_score{tmpNum} = curAUC_Borji_score;
-                    tmpNum = tmpNum+1;
-                else
-                    error('The name of FixationMap and SaliencyMap must be the same');
-                end
-            end
-            AUC_Borji_score = mean(cell2mat(AUC_Borji_score), 2);
-            saveAUC_Borji_score = strcat('AUC_Borji', '_', subidsSaliencyMap(curAlgNum).name);
-            eval([saveAUC_Borji_score, '=', 'AUC_Borji_score']);
             
-            save(outFileName, saveAUC_Borji_score);
-            fprintf(DatasetsTxt, '%f\n', AUC_Borji_score);
+            if length(subsubidsSaliencyMap) == length(idsFixationMap)
+                AUC_Borji_score = cell(1, imgNum);
+                tmpNum = 1;
+                for curImgNum = 1:length(subsubidsSaliencyMap)
+                    if subsubidsSaliencyMap(curImgNum, 1).name(1)=='.'
+                        continue;
+                    end
+                    [pathstrFixationMap, nameFixationMap, extFixationMap] = fileparts(strcat(InputFixationMap, idsFixationMap(curImgNum, 1).name));
+                    [pathstrSaliencyMap, nameSaliencyMap, extSaliencyMap] = fileparts(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/', subsubidsSaliencyMap(curImgNum, 1).name));
+                    if strcmp(nameFixationMap, nameSaliencyMap)
+                        curSaliencyMap = double(imread(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/', subsubidsSaliencyMap(curImgNum, 1).name)));
+                        eval(['load ', strcat(InputFixationMap, idsFixationMap(curImgNum, 1).name)]);
+                        curAUC_Borji_score = AUC_Borji(curSaliencyMap, fixLocs);
+                        AUC_Borji_score{tmpNum} = curAUC_Borji_score;
+                        tmpNum = tmpNum+1;
+                    else
+                        error('The name of FixationMap and SaliencyMap must be the same.');
+                    end
+                end
+                AUC_Borji_score = mean(cell2mat(AUC_Borji_score), 2);
+                saveAUC_Borji_score = strcat('AUC_Borji', '_', subidsSaliencyMap(curAlgNum).name);
+                eval([saveAUC_Borji_score, '=', 'AUC_Borji_score']);
+                
+                save(outFileName, saveAUC_Borji_score);
+                fprintf(DatasetsTxt, '%f\n', AUC_Borji_score);
+            else
+                error('The number of saliency maps and the number of fixation maps must be the same.');
+            end
         end
         break;
     end
