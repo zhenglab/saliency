@@ -40,21 +40,9 @@ for i = 1:length(idsFixationMap)
                     [pathstrSaliencyMap, nameSaliencyMap, extSaliencyMap] = fileparts(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/', subsubidsSaliencyMap(curImgNum, 1).name));
                     if strcmp(nameFixationMap, nameSaliencyMap)
                         rawSMap = double(imread(strcat(InputSaliencyMap, subidsSaliencyMap(curAlgNum, 1).name, '/', subsubidsSaliencyMap(curImgNum, 1).name)));
-                        if ~isempty(strfind(InputFixationMap, 'bruce'))
-                            rawSMap = imresize(rawSMap, [511 681], 'bilinear');
-                        elseif ~isempty(strfind(InputFixationMap, 'imgsal'))
-                            rawSMap = imresize(rawSMap, [480 640], 'bilinear');
-                        elseif ~isempty(strfind(InputFixationMap, 'judd'))
-                            load juddSize.mat;
-                            rawSMap = imresize(rawSMap, sizeData(str2num(nameFixationMap),:), 'bilinear');
-                        elseif ~isempty(strfind(InputFixationMap, 'pascal'))
-                            load pascalSize.mat;
-                            rawSMap = imresize(rawSMap, sizeData(str2num(nameFixationMap),:), 'bilinear');
-                        else
-                            rawSMap = imresize(rawSMap, [1080 1920], 'bilinear');
-                        end
                         eval(['load ', strcat(InputFixationMap, idsFixationMap(curImgNum, 1).name)]);
-                        kSizeList = norm(size(rawSMap)).*sigmaList;
+                        rawSMap = imresize(rawSMap, size(fixLocs));
+                        kSizeList = norm(size(fixLocs)).*sigmaList;
                         kNum = length(kSizeList);
                         tmpAUC = zeros(kNum, 1);
                         for curK = 1:kNum
