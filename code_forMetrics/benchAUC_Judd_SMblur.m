@@ -1,7 +1,7 @@
 function benchAUC_Judd_SMblur()
-InputFixationMap = './tmp/FixationMaps/';
-InputSaliencyMap = './tmp/SaliencyMaps/';
-OutputResults = './tmp/Results/AUC_Judd_SMblur/';
+InputFixationMap = './FixationMaps/';
+InputSaliencyMap = './SaliencyMaps/';
+OutputResults = './Results/AUC_Judd_SMblur/';
 traverse(InputFixationMap, InputSaliencyMap, OutputResults)
 
 function traverse(InputFixationMap, InputSaliencyMap, OutputResults)

@@ -1,7 +1,7 @@
 function benchAUC_Borji_SMblur()
-InputFixationMap = './tmp/FixationMaps/';
-InputSaliencyMap = './tmp/SaliencyMaps/';
-OutputResults = './tmp/Results/AUC_Borji_SMblur/';
+InputFixationMap = './FixationMaps/';
+InputSaliencyMap = './SaliencyMaps/';
+OutputResults = './Results/AUC_Borji_SMblur/';
 traverse(InputFixationMap, InputSaliencyMap, OutputResults)
 
 function traverse(InputFixationMap, InputSaliencyMap, OutputResults)

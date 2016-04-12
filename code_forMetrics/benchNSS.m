@@ -1,7 +1,7 @@
 function benchNSS()
-InputFixationMap = './tmp/FixationMaps/';
-InputSaliencyMap = './tmp/SaliencyMaps/';
-OutputResults = './tmp/Results/NSS/';
+InputFixationMap = './FixationMaps/';
+InputSaliencyMap = './SaliencyMaps/';
+OutputResults = './Results/NSS/';
 traverse(InputFixationMap, InputSaliencyMap, OutputResults)
 
 function traverse(InputFixationMap, InputSaliencyMap, OutputResults)

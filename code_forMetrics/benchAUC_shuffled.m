@@ -1,7 +1,7 @@
 function benchAUC_shuffled()
-InputFixationMap = './tmp/FixationMaps/';
-InputSaliencyMap = './tmp/SaliencyMaps/';
-OutputResults = './tmp/Results/AUC_shuffled2/';
+InputFixationMap = './FixationMaps/';
+InputSaliencyMap = './SaliencyMaps/';
+OutputResults = './Results/AUC_shuffled/';
 traverse(InputFixationMap, InputSaliencyMap, OutputResults)
 
 function traverse(InputFixationMap, InputSaliencyMap, OutputResults)

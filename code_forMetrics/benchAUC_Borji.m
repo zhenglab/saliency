@@ -1,7 +1,7 @@
 function benchAUC_Borji()
-InputFixationMap = './tmp/FixationMaps/';
-InputSaliencyMap = './tmp/SaliencyMaps/';
-OutputResults = './tmp/Results/AUC_Borji/';
+InputFixationMap = './FixationMaps/';
+InputSaliencyMap = './SaliencyMaps/';
+OutputResults = './Results/AUC_Borji/';
 traverse(InputFixationMap, InputSaliencyMap, OutputResults)
 
 function traverse(InputFixationMap, InputSaliencyMap, OutputResults)
